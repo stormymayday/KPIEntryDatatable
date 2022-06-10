@@ -1,5 +1,10 @@
 <template>
     <lightning-card title="KPI Entry Datatable">
 
+        <!-- Rendering the Datatable -->
+        <template if:true={tableData}>
+            <lightning-datatable key-field="Id" data={tableData} columns={columns}></lightning-datatable>
+        </template>
+
     </lightning-card>
 </template>
