@@ -3,7 +3,9 @@
 
         <!-- Rendering the Datatable -->
         <template if:true={tableData}>
-            <lightning-datatable key-field="Id" data={tableData} columns={columns}></lightning-datatable>
+            <lightning-datatable key-field="Id" data={tableData} columns={columns} onsave={handleSave}
+                draft-values={draftValues}>
+            </lightning-datatable>
         </template>
 
     </lightning-card>
