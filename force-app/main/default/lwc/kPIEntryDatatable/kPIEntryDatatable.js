@@ -1,13 +1,10 @@
 import { LightningElement, wire, api } from 'lwc';
+
 import get_KPI_Entries from '@salesforce/apex/KPI_Entry_Controller.get_KPI_Entries';
+import update_KPI_Entries from '@salesforce/apex/KPI_Entry_Controller.update_KPI_Entries';
 
 import { refreshApex } from '@salesforce/apex';
-import { updateRecord } from 'lightning/uiRecordApi';
-
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
-import KPI_ENTRY_ID_FIELD from '@salesforce/schema/KPI_Entry__c.Id';
-import KPI_ENTRY_VALUE_FIELD from '@salesforce/schema/KPI_Entry__c.Value__c';
-
 
 const COLUMNS = [
     { label: 'Id', fieldName: 'Id' },
@@ -18,29 +15,68 @@ const COLUMNS = [
     { label: 'Value Type', fieldName: 'Value_Type__c' }
 ]
 
-export default class kpiEntryDatatable extends LightningElement {
+export default class kPIEntryDatatable extends LightningElement {
 
-    @api recordId;
+    wiredRecords;
+    error;
+    draftValues = [];
 
-    tableData
-    columns = COLUMNS
+    tableData;
+    columns = COLUMNS;
 
     @wire(get_KPI_Entries)
-    kpiEntryHandler({ data, error }) {
+    kpiEntryHandler(value) {
+
+        // track the provisioned value
+        this.wiredRecords = value;
+        const { data, error } = value;
 
         if (data) {
 
-            // console.log(data);
-
             this.tableData = data;
+            this.error = undefined;
+
+        } else if (error) {
+
+            this.error = error;
+            this.tableData = undefined;
 
         }
 
-        if (error) {
+    }
 
-            // console.error(error);
+    async handleSave(event) {
 
-        }
+        const updatedFields = event.detail.draftValues;
+
+        await update_KPI_Entries({ data: updatedFields })
+            .then(result => {
+
+                console.log(JSON.stringify("Apex update result: " + result));
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Success',
+                        message: 'KPI Entry updated',
+                        variant: 'success'
+                    })
+                );
+
+                refreshApex(this.wiredRecords).then(() => {
+                    this.draftValues = [];
+                });
+
+            }).catch(error => {
+
+                console.log('Error is ' + JSON.stringify(error));
+                this.dispatchEvent(
+                    new ShowToastEvent({
+                        title: 'Error updating or refreshing records',
+                        message: error.body.message,
+                        variant: 'error'
+                    })
+                );
+
+            });
 
     }
 
