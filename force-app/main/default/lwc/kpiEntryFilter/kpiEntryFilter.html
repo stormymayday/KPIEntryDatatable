@@ -1,0 +1,24 @@
+<template>
+    <lightning-card title="Filters" icon-name="standard:filter">
+        <div class="slds-m-horizontal_medium">
+
+            <!-- Project Lookup Field -->
+            <lightning-record-edit-form object-api-name="KPI__c">
+                <section class="slds-m-top_small">
+                    <lightning-input-field field-name="Project__c" onchange={handleOpportunityLookupChange}>
+                    </lightning-input-field>
+                </section>
+            </lightning-record-edit-form>
+
+            <!-- KPI Lookup Field -->
+            <lightning-record-edit-form object-api-name="KPI_Entry__c">
+                <section class="slds-m-top_small">
+                    <lightning-input-field field-name="KPI__c" onchange={handleOpportunityLookupChange}>
+                    </lightning-input-field>
+                </section>
+            </lightning-record-edit-form>
+
+
+        </div>
+    </lightning-card>
+</template>
